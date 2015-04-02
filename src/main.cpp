@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "HelloWorld.h"
+
 int main(int argc, const char *argv[])
 {
-    std::cout << "Hello world !" << std::endl;
+    HelloWorld hw;
+    std::cout << hw.getHelloWorld() << std::endl;
     return 0;
 }

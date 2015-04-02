@@ -59,13 +59,13 @@ mrproper: clean
 
 test: $(TEST_DIR)/libgtest.a
 	@echo "Compiling tests..."
-	$(CC) -isystem $(GTEST_DIR)/include -pthread $(TEST_DIR)/test.cpp $(TEST_DIR)/libgtest.a -o $(TEST_DIR)/test
+	$(CC) -isystem $(GTEST_DIR)/include -pthread $(TEST_DIR)/test.cpp $(TEST_DIR)/libgtest.a $(OBJ_FILES) -o $(TEST_DIR)/test
 	@echo "Running tests..."
 	$(TEST_DIR)/test
 
 $(TEST_DIR)/libgtest.a:
 	@echo "Building test library..."
-	$(CC) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(OBJDIR)/gtest-all.o
+	$(CC) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(CFLAGS) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(OBJDIR)/gtest-all.o
 	$(AR) -rv $(TEST_DIR)/libgtest.a $(OBJDIR)/gtest-all.o
 
 install:
