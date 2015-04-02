@@ -2,6 +2,7 @@
 TARGET  := $(shell basename $$PWD | tr '[:upper:]' '[:lower:]')
 # Compiler
 CC      := g++
+AR		:= ar
 # Warning levels
 WARN    :=
 # Optimisation
@@ -26,6 +27,9 @@ VPATH	:= $(INCDIR) $(SRCDIR) $(OBJDIR)
 CPP_SRCS    = $(wildcard src/*.cpp)
 OBJ_FILES   = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(CPP_SRCS))
 
+GTEST_DIR	= test/googletest
+TEST_DIR	= test
+
 all: objdir ${TARGET}
 
 $(TARGET): $(OBJ_FILES)
@@ -46,9 +50,17 @@ clean:
 	rm -rf $(OBJDIR)/*.o
 
 mrproper: clean
+	rm -rf $(TEST_DIR)/libgtest.a
 	rm -rf ${TARGET}
 
-test: ./test/googletest/make/
+test: $(TEST_DIR)/libgtest.a
+	@echo "Compiling tests..."
+	@echo "Running tests..."
+
+$(TEST_DIR)/libgtest.a:
+	@echo "Building test library..."
+	$(CC) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(OBJDIR)/gtest-all.o
+	$(AR) -rv $(TEST_DIR)/libgtest.a $(OBJDIR)/gtest-all.o
 
 install:
 	@echo "Installing..."
