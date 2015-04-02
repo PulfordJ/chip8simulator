@@ -19,16 +19,19 @@ INCDIR	:= include
 # Object directory
 OBJDIR	:= obj
 
+GTEST_DIR	= test/googletest
+TEST_DIR	= test
+
 CFLAGS	:= -I $(INCDIR)
 
 # setting the vpath (additionnal search path for make)
 VPATH	:= $(INCDIR) $(SRCDIR) $(OBJDIR)
 
 CPP_SRCS    = $(wildcard src/*.cpp)
-OBJ_FILES   = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(CPP_SRCS))
+TEST_SRCS	= $(wildcard test/*.cpp)
 
-GTEST_DIR	= test/googletest
-TEST_DIR	= test
+OBJ_FILES   = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(CPP_SRCS))
+TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.cpp,$(TEST_DIR)/%.o,$(TEST_SRCS))
 
 all: objdir ${TARGET}
 
@@ -48,6 +51,7 @@ objdir:
 clean: 
 	@echo "Cleaning..."
 	rm -rf $(OBJDIR)/*.o
+	rm -rf $(TEST_DIR)/*.o
 
 mrproper: clean
 	rm -rf $(TEST_DIR)/libgtest.a
@@ -55,7 +59,9 @@ mrproper: clean
 
 test: $(TEST_DIR)/libgtest.a
 	@echo "Compiling tests..."
+	$(CC) -isystem $(GTEST_DIR)/include -pthread $(TEST_DIR)/test.cpp $(TEST_DIR)/libgtest.a -o $(TEST_DIR)/test
 	@echo "Running tests..."
+	$(TEST_DIR)/test
 
 $(TEST_DIR)/libgtest.a:
 	@echo "Building test library..."
