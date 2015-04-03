@@ -1,6 +1,7 @@
 obj
 rogcxx
 *.swp
+test/test
 
 # Compiled Object files
 *.slo

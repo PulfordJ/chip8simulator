@@ -19,37 +19,56 @@ INCDIR	:= include
 # Object directory
 OBJDIR	:= obj
 
-GTEST_DIR	= test/googletest
-TEST_DIR	= test
-
 CFLAGS	:= -I $(INCDIR)
 
 # setting the vpath (additionnal search path for make)
 VPATH	:= $(INCDIR) $(SRCDIR) $(OBJDIR)
 
 CPP_SRCS    = $(wildcard src/*.cpp)
-TEST_SRCS	= $(wildcard test/*.cpp)
-
 OBJ_FILES   = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(CPP_SRCS))
+
+# Colors
+black	= `tput setaf 0`
+red		= `tput setaf 1`
+green	= `tput setaf 2`
+yellow	= `tput setaf 3`
+blue	= `tput setaf 4`
+magenta = `tput setaf 5`
+cyan	= `tput setaf 2`
+white	= `tput setaf 7`
+reset	= `tput sgr0`
+
+# Varibales to build the test library
+
+GTEST_DIR	= test/googletest
+GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h $(GTEST_DIR)/include/gtest/internal/*.h
+
+TEST_CPPFLAGS += -isystem $(GTEST_DIR)/include
+TEST_CXXFLAGS += -g -Wall -Wextra -pthread
+
+# Variable to build the tests
+
+TEST_DIR	= test
+TEST_SRCS	= $(wildcard test/*.cpp)
 TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.cpp,$(TEST_DIR)/%.o,$(TEST_SRCS))
 
-all: objdir ${TARGET}
+all: ${TARGET}
 
 $(TARGET): $(OBJ_FILES)
-	@echo "Linking..."
+	@echo "$(blue)Linking...$(reset)"
 	$(CC) $(WARN) $(OFLAGS) $(CFLAGS) $(LDFLAGS) $(OBJ_FILES) -o $@ $(LDLIBS) 
-	@echo "Done."
+	@echo "$(green)Done.$(reset)"
 
-obj/%.o: %.cpp
-	@echo "Compiling "$<"..."
+obj/%.o: %.cpp $(OBJDIR)
+	@echo "$(blue)Compiling $(yellow)"$<"$(blue)...$(reset)"
 	$(CC) -c $(WARN) $(OFLAGS) $(CFLAGS) $(LDFLAGS) $< -o $@
 
-objdir:
-	@echo "Creating object directory..."
+$(OBJDIR):
+	@echo "$(blue)Creating object directory..."$(reset)
 	mkdir -p $(OBJDIR)
 
 clean: 
-	@echo "Cleaning..."
+	@echo "$(blue)Cleaning...$(reset)"
 	rm -rf $(OBJDIR)/*.o
 	rm -rf $(TEST_DIR)/*.o
 
@@ -57,19 +76,25 @@ mrproper: clean
 	rm -rf $(TEST_DIR)/libgtest.a
 	rm -rf ${TARGET}
 
-test: $(TEST_DIR)/libgtest.a
-	@echo "Compiling tests..."
-	$(CC) -isystem $(GTEST_DIR)/include -pthread $(TEST_DIR)/test.cpp $(TEST_DIR)/libgtest.a $(OBJ_FILES) -o $(TEST_DIR)/test
-	@echo "Running tests..."
+test: $(TEST_DIR)/libgtest.a $(TEST_DIR)/gtest_main.a $(OBJ_FILES)
+	@echo "$(blue)Compiling tests...$(reset)"
+	$(CC) $(TEST_DIR)/test.cpp -o $(TEST_DIR)/test
+	@echo "$(blue)Running tests...$(reset)"
 	$(TEST_DIR)/test
+	@echo "$(green)Done.$(reset)"
 
 $(TEST_DIR)/libgtest.a:
-	@echo "Building test library..."
-	$(CC) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(CFLAGS) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(OBJDIR)/gtest-all.o
+	@echo "$(blue)Building test library...$(reset)"
+	$(CC) $(TEST_CPPFLAGS) -I$(GTEST_DIR) $(TEST_CXXFLAGS) -c $(GTEST_DIR)/src/gtest-all.cc -o $(OBJDIR)/gtest-all.o
 	$(AR) -rv $(TEST_DIR)/libgtest.a $(OBJDIR)/gtest-all.o
 
+$(TEST_DIR)/gtest_main.a:
+	@echo "$(blue)Building the test runner...$(reset)"
+	$(CC) $(TEST_CPPFLAGS) -I$(GTEST_DIR) $(TEST_CXXFLAGS) -c $(GTEST_DIR)/src/gtest_main.cc -o $(OBJDIR)/gtest-main.o
+	$(AR) -rv $(TEST_DIR)/gtest_main.a $(OBJDIR)/gtest-main.o
+
 install:
-	@echo "Installing..."
+	@echo "$(blue)Installing...$(reset)"
 
 doc:
-	@echo "Building documentation..."
+	@echo "$(blue)Building documentation...$(reset)"
