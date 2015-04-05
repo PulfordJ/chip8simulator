@@ -74,11 +74,13 @@ clean:
 
 mrproper: clean
 	rm -rf $(TEST_DIR)/libgtest.a
+	rm -rf $(TEST_DIR)/gtest_main.a
 	rm -rf ${TARGET}
 
-test: $(TEST_DIR)/libgtest.a $(TEST_DIR)/gtest_main.a $(OBJ_FILES)
+test: $(filter-out $(OBJDIR)/main.o, $(OBJ_FILES)) $(TEST_DIR)/libgtest.a $(TEST_DIR)/gtest_main.a
 	@echo "$(blue)Compiling tests...$(reset)"
-	$(CC) $(TEST_DIR)/test.cpp -o $(TEST_DIR)/test
+	@echo "$(cyan)Linking the test executable with the following objects: $(yellow)$^$(reset)"
+	$(CC) $(TEST_DIR)/test.cpp $(CFLAGS) $^ $(TEST_CXXFLAGS) -o $(TEST_DIR)/test
 	@echo "$(blue)Running tests...$(reset)"
 	$(TEST_DIR)/test
 	@echo "$(green)Done.$(reset)"
@@ -98,3 +100,4 @@ install:
 
 doc:
 	@echo "$(blue)Building documentation...$(reset)"
+
