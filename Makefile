@@ -49,6 +49,7 @@ TEST_CXXFLAGS += -g -Wall -Wextra -pthread
 # Variable to build the tests
 
 TEST_DIR	= test
+TEST_EXEC 	= $(TEST_DIR)/test
 TEST_SRCS	= $(wildcard test/*.cpp)
 TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.cpp,$(TEST_DIR)/%.o,$(TEST_SRCS))
 
@@ -68,22 +69,25 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 clean: 
-	@echo "$(blue)Cleaning...$(reset)"
+	@echo "$(blue)Cleaning objects...$(reset)"
 	rm -rf $(OBJDIR)/*.o
 	rm -rf $(TEST_DIR)/*.o
 
 mrproper: clean
+	@echo "$(blue)Cleaning executables...$(reset)"
 	rm -rf $(TEST_DIR)/libgtest.a
 	rm -rf $(TEST_DIR)/gtest_main.a
+	rm -rf $(TEST_EXEC)
 	rm -rf ${TARGET}
 
-test: $(filter-out $(OBJDIR)/main.o, $(OBJ_FILES)) $(TEST_DIR)/libgtest.a $(TEST_DIR)/gtest_main.a
-	@echo "$(blue)Compiling tests...$(reset)"
-	@echo "$(cyan)Linking the test executable with the following objects: $(yellow)$^$(reset)"
-	$(CC) $(TEST_DIR)/test.cpp $(CFLAGS) $^ $(TEST_CXXFLAGS) -o $(TEST_DIR)/test
-	@echo "$(blue)Running tests...$(reset)"
-	$(TEST_DIR)/test
+test: $(TEST_EXEC)
+	@$(TEST_DIR)/test | sed "s/FAILED/$(red)FAILED$(reset)/g" | sed "s/OK/$(green)OK$(reset)/g" | sed "s/PASSED/$(green)PASSED$(reset)/g" | sed "s/RUN/$(blue)RUN$(reset)/g"
 	@echo "$(green)Done.$(reset)"
+
+$(TEST_EXEC): $(filter-out $(OBJDIR)/main.o, $(OBJ_FILES)) $(TEST_DIR)/libgtest.a $(TEST_DIR)/gtest_main.a
+	@echo "$(blue)Compiling the test executable...$(reset)"
+	@echo "$(cyan)Linking the test executable with the following objects: $(yellow)$^$(reset)."
+	$(CC) $(TEST_DIR)/test.cpp $(CFLAGS) $^ $(TEST_CXXFLAGS) -o $(TEST_EXEC)
 
 $(TEST_DIR)/libgtest.a:
 	@echo "$(blue)Building test library...$(reset)"
