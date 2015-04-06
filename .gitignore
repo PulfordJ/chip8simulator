@@ -1,6 +1,7 @@
-obj
-rogcxx
+# Editor swap files
 *.swp
+
+# Test executables
 test/test
 
 # Compiled Object files
@@ -8,6 +9,7 @@ test/test
 *.lo
 *.o
 *.obj
+obj
 
 # Precompiled Headers
 *.gch
