@@ -2,6 +2,11 @@
 
 Chip8 chip8;
 
+
+void drawGraphics() {
+
+}
+
 int main(int argc, char **argv) 
 {
 	//setupGraphics
@@ -17,12 +22,13 @@ int main(int argc, char **argv)
 		chip8.emulateCycle();
 
 		//If draw flag set, update screen.
-		if (myChip8.getDrawFlag()){
+		if (chip8.getDrawFlag()){
 			drawGraphics();
 		}
 
 		// Store key press state.
-		Chip8.setkeys();
+		chip8.setKeys();
 	}
 	return 0;
 }
+
