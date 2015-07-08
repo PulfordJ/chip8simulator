@@ -5,9 +5,11 @@
 
 class Chip8 {
 public:
-  explicit Chip8 ();
-  virtual ~Chip8 ();
+  Chip8(){};
   void loadGame(std::string);
+  void emulateCycle();
+  void setKeys();
+  bool getDrawFlag();
   int DoSomething(std::string);
   
 private:
@@ -26,7 +28,6 @@ private:
   unsigned short stack_pointer;
 
   unsigned char key[16];
-
 
 
 };
