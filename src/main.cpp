@@ -1,10 +1,28 @@
-#include <iostream>
+#include "Chip8.h"
 
-#include "HelloWorld.h"
+Chip8 chip8;
 
-int main(int argc, const char *argv[])
+int main(int argc, char **argv) 
 {
-    HelloWorld hw;
-    std::cout << hw.getHelloWorld() << std::endl;
-    return 0;
+	//setupGraphics
+	//setupInput
+	//
+	//
+	//Potentially this, but hopefully all in constructor.
+	//chip8.initialize();
+	chip8.loadGame("pong");
+
+	for(;;)
+	{
+		chip8.emulateCycle();
+
+		//If draw flag set, update screen.
+		if (myChip8.getDrawFlag()){
+			drawGraphics();
+		}
+
+		// Store key press state.
+		Chip8.setkeys();
+	}
+	return 0;
 }

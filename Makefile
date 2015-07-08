@@ -40,7 +40,7 @@ reset	= `tput sgr0`
 
 # Varibales to build the test library
 
-GTEST_DIR	= test/googletest
+GTEST_DIR	= /usr/src/gtest
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h $(GTEST_DIR)/include/gtest/internal/*.h
 
 TEST_CPPFLAGS += -isystem $(GTEST_DIR)/include
