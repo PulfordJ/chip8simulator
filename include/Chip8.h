@@ -5,8 +5,8 @@
 
 class Chip8 {
 public:
-  Chip8(){};
-  void loadGame(std::string);
+  Chip8();
+  void loadGame(int * gameBuffer);
   void emulateCycle();
   void setKeys();
   bool getDrawFlag();

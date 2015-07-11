@@ -8,7 +8,7 @@ WARN    :=
 # Optimisation
 OFLAGS  := 
 # Link Options
-LDFLAGS := 
+LDFLAGS := -lSDL2
 # Link Libraries
 LDLIBS 	:= 
 
