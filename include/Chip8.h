@@ -1,18 +1,21 @@
 #ifndef D_Chip8_H
 #define D_Chip8_H
 
+static const int GFX_SIZE = 64 * 32;
+
 #include <string>
 
 class Chip8 {
 public:
   Chip8();
-  void loadGame(int * gameBuffer);
+  void loadGame(unsigned char * gameBuffer);
   void emulateCycle();
   void setKeys();
   bool getDrawFlag();
   int DoSomething(std::string);
   
-private:
+//TODO consider making private.
+public:
   /* data */
   unsigned short opcode;
   unsigned char memory[4096];
@@ -20,7 +23,7 @@ private:
   unsigned short index_register;
   unsigned short program_counter; 
 
-  unsigned char gfx[64 * 32];
+  unsigned char gfx[GFX_SIZE];
   unsigned char delay_timer;
   unsigned char sound_timer;
 

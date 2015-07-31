@@ -79,6 +79,8 @@ int main(int argc, char **argv)
 	//TODO add loop into workflow.
 	//for(;;)
 	//{
+    char game [2] = {0xA2, 0xF0 };
+        chip8.loadGame(game);
 		chip8.emulateCycle();
 
 		//If draw flag set, update screen.

@@ -14,12 +14,12 @@ Chip8::Chip8() {
 		//TODO memory[i] = chip8_fontset[i];
 	}
 
-	
+
 
 }
 
 
-void Chip8::loadGame(int * gameBuffer) {
+void Chip8::loadGame(unsigned char * gameBuffer) {
 	//TODO
 	for (int i = 0; i < 80; ++i){
 	  memory[i + 0x200] = gameBuffer[i];
@@ -30,15 +30,8 @@ void Chip8::emulateCycle() {
 	//Fetch
 	opcode = memory[program_counter] << 8 | memory[program_counter + 1];
 	//Decode
-	if (opcode >= 0xA000 || opcode <= 0xAFFF) {
-	  //Execute
-	  //ANNN sets I to the address NNN.
-	  //Get only address bits from the opcode.
-	  index_register = opcode & 0x0FFF;
-	  program_counter += 2;
-	}
 
-	switch(opcode & 0x0FFF)
+	switch(opcode & 0xF000)
 	{
 		//Compare against each opcode
 		case 0xA000:
@@ -48,8 +41,31 @@ void Chip8::emulateCycle() {
 	  		index_register = opcode & 0x0FFF;
 	  		program_counter += 2;
 			break;
-		//TODO need inner switch to handle 0x00E0 and 0x00EE 
-		//As first four bits are 00 in both cases.
+
+		case 0x1000:
+			program_counter = opcode & 0x0FFF;
+			break;
+		case 0x2000:
+			stack[stack_pointer] = program_counter;
+			stack_pointer++;
+			program_counter = opcode & 0x0FFF;
+			break;
+
+		case 0x0000:
+			//As first byte is 0 in both cases further check needed.
+			if ((opcode & 0x00EE) ==  0x00EE){
+				//TODO Dealing with 0x00EE
+
+			}
+			else {
+				//Dealing with 0x00E0.
+				//0x00E0 clears screen
+				for (int i = 0; i < GFX_SIZE; ++i) {
+					gfx[i] = 0;
+				}
+				program_counter += 2;
+			}
+			break;
 		default:
 			printf("Unknown opcode: 0x%X\n", opcode);
 	}
