@@ -29,6 +29,10 @@ void Chip8::loadGame(unsigned char * gameBuffer) {
 void Chip8::emulateCycle() {
 	//Fetch
 	opcode = memory[program_counter] << 8 | memory[program_counter + 1];
+
+	int regIndex = (opcode & 0x0F00) >> 8;
+	int regValue = opcode & 0x00FF;
+	int regIndex2 = (opcode & 0x00F0) >> 4;
 	//Decode
 
 	switch(opcode & 0xF000)
@@ -50,7 +54,35 @@ void Chip8::emulateCycle() {
 			stack_pointer++;
 			program_counter = opcode & 0x0FFF;
 			break;
+		case 0x6000:
+			general_registers[regIndex] = regValue;
+			program_counter += 2;
+			break;
+		case 0x7000:
+			general_registers[regIndex] += regValue;
+			program_counter += 2;
+			break;
+		case 0x8000: {
+			char subOpcode = opcode & 0x000f;
 
+			if (subOpcode == 0) {
+				general_registers[regIndex] = general_registers[regIndex2];
+			}
+			else if (subOpcode == 1) {
+				//Or operation
+				general_registers[regIndex] = general_registers[regIndex] | general_registers[regIndex2];
+			}
+			else if (subOpcode == 2) {
+				//And operation
+				general_registers[regIndex] = general_registers[regIndex] & general_registers[regIndex2];
+			}
+			else if (subOpcode == 3) {
+				//XOR operation
+				general_registers[regIndex] = general_registers[regIndex] ^ general_registers[regIndex2];
+			}
+				program_counter += 2;
+			}
+			break;
 		case 0x0000:
 			//As first byte is 0 in both cases further check needed.
 			if ((opcode & 0x00EE) ==  0x00EE){

@@ -83,7 +83,80 @@ TEST(InstructionTest, 6XNNexecution) {
 
     unsigned char game[2] = {0x61, 0xC0};
     chip8.loadGame(game);
+    unsigned short program_counter_before_cycle = chip8.program_counter;
     chip8.emulateCycle();
 
-    EXPECT_EQ(0xC0, chip8.general_registers[0x6]);
+    EXPECT_EQ(0xC0, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+TEST(InstructionTest, 7XNNexecution) {
+    Chip8 chip8;
+
+    unsigned char game[4] = {0x61, 0xC0, 0x71, 0x01};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0xC0 + 1, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+TEST(InstructionTest, 8XY0execution) {
+    Chip8 chip8;
+
+    unsigned char game[4] = {0x61, 0xC0, 0x80, 0x10};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0xC0, chip8.general_registers[0x00]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+//OR
+TEST(InstructionTest, 8XY1execution) {
+    Chip8 chip8;
+
+    unsigned char game[6] = {0x60, 0x02, 0x61, 0x01, 0x80, 0x11};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x03, chip8.general_registers[0x00]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+//AND
+TEST(InstructionTest, 8XY2execution) {
+    Chip8 chip8;
+
+    unsigned char game[6] = {0x60, 0x02, 0x61, 0x01, 0x81, 0x02};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x00, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+//XOR
+TEST(InstructionTest, 8XY3execution) {
+    Chip8 chip8;
+
+    unsigned char game[6] = {0x60, 0x02, 0x61, 0x03, 0x81, 0x03};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x01, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
 }
