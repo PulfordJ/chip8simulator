@@ -80,6 +80,42 @@ void Chip8::emulateCycle() {
 				//XOR operation
 				general_registers[regIndex] = general_registers[regIndex] ^ general_registers[regIndex2];
 			}
+			else if (subOpcode == 4) {
+				unsigned short sumOfRegs = general_registers[regIndex] + general_registers[regIndex2];
+				if (sumOfRegs > 255) {
+					general_registers[0xF] = 1;
+				}
+				else {
+					general_registers[0xf] = 0;
+				}
+				general_registers[regIndex] = sumOfRegs;
+			}
+			else if (subOpcode == 5) {
+				int LHRegIndex = regIndex;
+				int RHRegIndex = regIndex2;
+				int ResultRegIndex = regIndex;
+
+				minus(LHRegIndex, RHRegIndex, ResultRegIndex);
+
+			}
+			else if (subOpcode == 6) {
+				// Get list significant bit.
+				general_registers[0xF] = general_registers[regIndex] % 2;
+				general_registers[regIndex] >>= 1;
+			}
+			else if (subOpcode == 7) {
+				minus(regIndex2, regIndex, regIndex);
+			}
+			else if (subOpcode == 0xE) {
+				// Get list significant bit.
+				if (general_registers[regIndex] > 127) {
+					general_registers[0xF] = true;
+				}
+				else {
+					general_registers[0xF] = false;
+				}
+				general_registers[regIndex] <<= 1;
+			}
 				program_counter += 2;
 			}
 			break;
@@ -114,6 +150,18 @@ void Chip8::emulateCycle() {
 		}
 		--sound_timer;
 	}
+}
+
+void Chip8::minus(int LHRegIndex, int RHRegIndex, int ResultRegIndex) {
+	unsigned short resultOfMinus = general_registers[LHRegIndex] - general_registers[RHRegIndex];
+	if (resultOfMinus > 255) {
+					general_registers[0xF] = 1;
+				}
+				else {
+					general_registers[0xf] = 0;
+				}
+
+	general_registers[ResultRegIndex] = resultOfMinus;
 }
 
 void Chip8::setKeys() {

@@ -160,3 +160,136 @@ TEST(InstructionTest, 8XY3execution) {
     EXPECT_EQ(0x01, chip8.general_registers[0x01]);
     EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
 }
+
+//Add VX and VY
+TEST(InstructionTest, 8XY4execution) {
+    Chip8 chip8;
+
+    unsigned char game[6] = {0x60, 0x02, 0x61, 0x03, 0x81, 0x04};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x05, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+    EXPECT_EQ(0x00, chip8.general_registers[0xF]);
+}
+
+void instruction8XXXTest(unsigned char * game, int result_expected, int vf_carry_expected){
+    Chip8 chip8;
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(result_expected, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+    EXPECT_EQ(vf_carry_expected, chip8.general_registers[0xF]);
+}
+
+//Add VX and VY with carry
+TEST(InstructionTest, 8XY4executionWithCarry) {
+    unsigned char game[6] = {0x60, 0xFF, 0x61, 0x01, 0x81, 0x04};
+    int result_expected = 0x00;
+    int vf_carry_expected = 0x01;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+
+//Subtract VX and VY
+TEST(InstructionTest, 8XY5execution) {
+    unsigned char game[6] = {0x61, 0xFF, 0x60, 0x01, 0x81, 0x05};
+    int result_expected = 0xFE;
+    int vf_carry_expected = 0x00;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+//Subtract VX and VY with carry
+TEST(InstructionTest, 8XY5executionWithCarry) {
+    unsigned char game[6] = {0x61, 0xFE, 0x60, 0xFF, 0x81, 0x05};
+    int result_expected = 0xFF;
+    int vf_carry_expected = 0x01;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+TEST(InstructionTest, 8XY6execution) {
+    unsigned char game[6] = {0x61, 0xFE, 0x60, 0x01, 0x81, 0x06};
+    int result_expected = 0x7F;
+    int vf_carry_expected = 0x00;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+TEST(InstructionTest, 8XY6executionWithCarry) {
+    unsigned char game[6] = {0x61, 0xFF, 0x60, 0xFF, 0x81, 0x06};
+    int result_expected = 0x7F;
+    int vf_carry_expected = 0x01;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+TEST(InstructionTest, 8XY7execution) {
+    unsigned char game[6] = {0x61, 0x05, 0x60, 0x07, 0x81, 0x07};
+    int result_expected = 0x02;
+    int vf_carry_expected = 0x00;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+TEST(InstructionTest, 8XY7executionWithCarry) {
+    unsigned char game[6] = {0x61, 0x05, 0x60, 0x03, 0x81, 0x07};
+    int result_expected = 0xFE;
+    int vf_carry_expected = 0x01;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+TEST(InstructionTest, 8XYEexecution) {
+    unsigned char game[6] = {0x61, 0x7F, 0x60, 0x01, 0x81, 0x0E};
+    int result_expected = 0xFE;
+    int vf_carry_expected = 0x00;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+TEST(InstructionTest, 8XYEexecutionWithCarry) {
+    unsigned char game[6] = {0x61, 0xFF, 0x60, 0xFF, 0x81, 0x0E};
+    int result_expected = 0xFE;
+    int vf_carry_expected = 0x01;
+
+    instruction8XXXTest(game, result_expected, vf_carry_expected);
+}
+
+//Add VX and VY
+TEST(InstructionTest, 9XY0executionWithoutSkip) {
+    Chip8 chip8;
+
+    unsigned char game[6] = {0x60, 0x02, 0x61, 0x02, 0x91, 0x00};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+//Add VX and VY
+TEST(InstructionTest, 9XY0executionWithSkip) {
+    Chip8 chip8;
+
+    unsigned char game[6] = {0x60, 0x02, 0x61, 0x03, 0x91, 0x00};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(program_counter_before_cycle + 4, chip8.program_counter);
+}

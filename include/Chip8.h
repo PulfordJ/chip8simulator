@@ -33,6 +33,7 @@ public:
   unsigned char key[16];
 
 
+  void minus(int LHRegIndex, int RHRegIndex, int ResultRegIndex);
 };
 
 #endif // D_Chip8_H
