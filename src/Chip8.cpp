@@ -38,13 +38,7 @@ void Chip8::emulateCycle() {
 	switch(opcode & 0xF000)
 	{
 		//Compare against each opcode
-		case 0xA000:
-			//Execute
-	  		//ANNN sets I to the address NNN.
-	  		//Get only address bits from the opcode.
-	  		index_register = opcode & 0x0FFF;
-	  		program_counter += 2;
-			break;
+
 
 		case 0x1000:
 			program_counter = opcode & 0x0FFF;
@@ -118,6 +112,22 @@ void Chip8::emulateCycle() {
 			}
 				program_counter += 2;
 			}
+			break;
+		case 0x9000:
+			if (general_registers[regIndex] != general_registers[regIndex2]) {
+				program_counter += 2;
+			}
+			program_counter += 2;
+			break;
+		case 0xA000:
+			//Execute
+			//ANNN sets I to the address NNN.
+			//Get only address bits from the opcode.
+			index_register = opcode & 0x0FFF;
+			program_counter += 2;
+			break;
+		case 0xB000:
+			program_counter = (opcode & 0x0FFF) + general_registers[0x0];
 			break;
 		case 0x0000:
 			//As first byte is 0 in both cases further check needed.

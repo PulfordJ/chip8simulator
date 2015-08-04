@@ -2,17 +2,6 @@
 #include "HelloWorld.h"
 #include "gtest/gtest.h"
 
-TEST(InstructionTest, ANNNexecution) {
-    Chip8 chip8;
-
-    unsigned char game[2] = {0xA2, 0xF0};
-    chip8.loadGame(game);
-    unsigned short program_counter_before_cycle = chip8.program_counter;
-    chip8.emulateCycle();
-
-    EXPECT_EQ(0x2F0, chip8.index_register);
-    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
-}
 
 
 TEST(InstructionTest, 0NNNexecution) {
@@ -87,6 +76,18 @@ TEST(InstructionTest, 6XNNexecution) {
     chip8.emulateCycle();
 
     EXPECT_EQ(0xC0, chip8.general_registers[0x01]);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+TEST(InstructionTest, 6XNNexecutionV0) {
+    Chip8 chip8;
+
+    unsigned char game[2] = {0x60, 0x04};
+    chip8.loadGame(game);
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x04, chip8.general_registers[0x00]);
     EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
 }
 
@@ -292,4 +293,28 @@ TEST(InstructionTest, 9XY0executionWithSkip) {
     chip8.emulateCycle();
 
     EXPECT_EQ(program_counter_before_cycle + 4, chip8.program_counter);
+}
+
+
+TEST(InstructionTest, ANNNexecution) {
+    Chip8 chip8;
+
+    unsigned char game[2] = {0xA2, 0xF0};
+    chip8.loadGame(game);
+    unsigned short program_counter_before_cycle = chip8.program_counter;
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x2F0, chip8.index_register);
+    EXPECT_EQ(program_counter_before_cycle + 2, chip8.program_counter);
+}
+
+TEST(InstructionTest, BNNNexecution) {
+    Chip8 chip8;
+
+    unsigned char game[4] = {0x60, 0x04, 0xB0, 0xE0};
+    chip8.loadGame(game);
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+
+    EXPECT_EQ(0x0E0 + 0x4, chip8.program_counter);
 }
