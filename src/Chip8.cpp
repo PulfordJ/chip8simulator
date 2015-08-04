@@ -1,7 +1,8 @@
 #include "Chip8.h"
 #include <stdio.h>
+#include <random>
 
-Chip8::Chip8() {
+Chip8::Chip8(): rng(rd()), dis(0, 0xFF)  {
 	program_counter	= 0x200; /// Program space starts at 0x200
 
 	//Initialise current opcode, index register and stack pointer.
@@ -14,8 +15,7 @@ Chip8::Chip8() {
 		//TODO memory[i] = chip8_fontset[i];
 	}
 
-
-
+	//Seed for andom gen engine.
 }
 
 
@@ -128,6 +128,10 @@ void Chip8::emulateCycle() {
 			break;
 		case 0xB000:
 			program_counter = (opcode & 0x0FFF) + general_registers[0x0];
+			break;
+		case 0xC000:
+			//TODO
+			general_registers[regIndex] = dis(rng) & regValue;
 			break;
 		case 0x0000:
 			//As first byte is 0 in both cases further check needed.

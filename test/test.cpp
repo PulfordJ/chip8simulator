@@ -318,3 +318,22 @@ TEST(InstructionTest, BNNNexecution) {
 
     EXPECT_EQ(0x0E0 + 0x4, chip8.program_counter);
 }
+
+
+TEST(InstructionTest, CXNNexecution) {
+    Chip8 chip8;
+
+    unsigned char game[4] = {0xC0, 0xFF, 0xA0, 0x00};
+    chip8.loadGame(game);
+
+    chip8.emulateCycle();
+    chip8.emulateCycle();
+
+    const unsigned char randomNumber = chip8.general_registers[0x0];
+    EXPECT_TRUE(randomNumber >= 0x0 and randomNumber <= 0xFF);
+    FAIL();
+}
+
+TEST(InstructionTest, DXYNexecution) {
+    FAIL();
+}

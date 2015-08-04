@@ -1,9 +1,11 @@
 #ifndef D_Chip8_H
 #define D_Chip8_H
+#include <random>
 
 static const int GFX_SIZE = 64 * 32;
 
 #include <string>
+//#include <bits/random.h>
 
 class Chip8 {
 public:
@@ -34,6 +36,10 @@ public:
 
 
   void minus(int LHRegIndex, int RHRegIndex, int ResultRegIndex);
+private:
+  std::random_device rd;     // only used once to initialise (seed) engine
+  std::mt19937 rng;    // random-number engine used (Mersenne-Twister in this case)
+  std::uniform_int_distribution<> dis;
 };
 
 #endif // D_Chip8_H

@@ -19,7 +19,7 @@ INCDIR	:= include
 # Object directory
 OBJDIR	:= obj
 
-CFLAGS	:= -I $(INCDIR)
+CFLAGS	:= -I $(INCDIR) -std=c++11
 
 # setting the vpath (additionnal search path for make)
 VPATH	:= $(INCDIR) $(SRCDIR) $(OBJDIR)
