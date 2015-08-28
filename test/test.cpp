@@ -320,20 +320,64 @@ TEST(InstructionTest, BNNNexecution) {
 }
 
 
-TEST(InstructionTest, CXNNexecution) {
+TEST(InstructionTest, CXNNexecutionWith00Bitmask) {
     Chip8 chip8;
 
-    unsigned char game[4] = {0xC0, 0xFF, 0xA0, 0x00};
-    chip8.loadGame(game);
+    unsigned char game[4] = {0xC0, 0x00, 0xA0, 0x00};
 
-    chip8.emulateCycle();
-    chip8.emulateCycle();
+        chip8.loadGame(game);
+        chip8.emulateCycle();
+        chip8.emulateCycle();
 
     const unsigned char randomNumber = chip8.general_registers[0x0];
-    EXPECT_TRUE(randomNumber >= 0x0 and randomNumber <= 0xFF);
-    FAIL();
+    EXPECT_EQ(0x00, randomNumber);
+}
+
+#include<map>
+
+TEST(InstructionTest, CXNNexecutionUniformDistribution) {
+    Chip8 chip8;
+    unsigned char game[4] = {0xC0, 0x00, 0xA0, 0x00};
+
+    //Initialise all values to 0.
+    int results [0xFF+1] = { };
+
+    int TOTAL_ROLLS = 10000000;
+    double ACCEPTABLE_ERROR = .001;
+
+    for (int i = 0; i < TOTAL_ROLLS; ++i) {
+
+        chip8.loadGame(game);
+        chip8.emulateCycle();
+        chip8.emulateCycle();
+        const unsigned char randomNumber = chip8.general_registers[0x0];
+        results[randomNumber]++;
+    }
+
+    for( int& result : results) {
+        double frequency = result/TOTAL_ROLLS;
+
+        EXPECT_TRUE(frequency <= TOTAL_ROLLS/0xFF+1 + ACCEPTABLE_ERROR);
+    }
 }
 
 TEST(InstructionTest, DXYNexecution) {
-    FAIL();
+        Chip8 chip8;
+
+    //TODO make D00N run 4 times to draw a complete 0 instead of first row.
+        unsigned char game[8] = {0xA0, 0x00, 0x60, 0x00, 0x61, 0x01, 0xD0, 0x11};
+        chip8.loadGame(game);
+        unsigned short program_counter_before_cycle = chip8.program_counter;
+        chip8.emulateCycle();
+        chip8.emulateCycle();
+        chip8.emulateCycle();
+        chip8.emulateCycle();
+
+
+        EXPECT_EQ(chip8.gfx[1], 1);
+        EXPECT_EQ(chip8.gfx[2], 1);
+        EXPECT_EQ(chip8.gfx[3], 1);
+        EXPECT_EQ(chip8.gfx[4], 1);
+    
+        EXPECT_EQ(program_counter_before_cycle + 8, chip8.program_counter);
 }

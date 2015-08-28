@@ -39,7 +39,9 @@ public:
 private:
   std::random_device rd;     // only used once to initialise (seed) engine
   std::mt19937 rng;    // random-number engine used (Mersenne-Twister in this case)
-  std::uniform_int_distribution<> dis;
+  std::uniform_int_distribution<unsigned short> dis;
+
+
 };
 
 #endif // D_Chip8_H
