@@ -25,9 +25,10 @@ public:
   unsigned char memory[4096];
   unsigned char general_registers[16];
   unsigned short index_register;
-  unsigned short program_counter; 
+  unsigned short program_counter;
 
-  unsigned short gfx[GFX_HEIGHT];
+  //TODO http://stackoverflow.com/questions/12133950/creating-vector-of-boost-dynamic-bitset-in-c
+  boost::dynamic_bitset<> gfx[GFX_HEIGHT];
   unsigned char delay_timer;
   unsigned char sound_timer;
 

@@ -184,7 +184,7 @@ void Chip8::emulateCycle() {
             else {
                 //Dealing with 0x00E0.
                 //0x00E0 clears screen
-                for (int i = 0; i < GFX_SIZE; ++i) {
+                for (int i = 0; i < GFX_HEIGHT; ++i) {
                     //gfx[i].reset();
                 }
                 program_counter += 2;
