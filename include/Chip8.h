@@ -2,10 +2,12 @@
 #define D_Chip8_H
 #include <random>
 
-static const int GFX_SIZE = 64 * 32;
+static const int GFX_WIDTH = 64;
+static const int GFX_HEIGHT = 32;
+static const int GFX_SIZE = GFX_WIDTH * GFX_HEIGHT;
 
 #include <string>
-//#include <bits/random.h>
+#include <boost/dynamic_bitset.hpp>
 
 class Chip8 {
 public:
@@ -25,7 +27,7 @@ public:
   unsigned short index_register;
   unsigned short program_counter; 
 
-  unsigned char gfx[GFX_SIZE];
+  unsigned short gfx[GFX_HEIGHT];
   unsigned char delay_timer;
   unsigned char sound_timer;
 
