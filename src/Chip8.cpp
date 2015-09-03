@@ -3,7 +3,7 @@
 #include <random>
 #include <boost/dynamic_bitset.hpp>
 
-Chip8::Chip8() : rng(rd()), dis(0, 0xFF) {
+Chip8::Chip8() : rng(rd()), dis(0, 0xFF), gfx(GFX_HEIGHT, boost::dynamic_bitset<>(GFX_WIDTH))  {
     program_counter = 0x200; /// Program space starts at 0x200
 
     //Initialise current opcode, index register and stack pointer.
@@ -52,8 +52,10 @@ void Chip8::emulateCycle() {
     opcode = memory[program_counter] << 8 | memory[program_counter + 1];
 
     int regIndex = (opcode & 0x0F00) >> 8;
-    int regValue = opcode & 0x00FF;
     int regIndex2 = (opcode & 0x00F0) >> 4;
+    //TODO check that no opcode assumes this is 0x000F bitwise and result.
+    int regValue = opcode & 0x00FF;
+
     //Decode
 
     switch (opcode & 0xF000) {
@@ -156,23 +158,44 @@ void Chip8::emulateCycle() {
         case 0xD000: {
             unsigned short x = regIndex;
             unsigned short y = regIndex2;
-            unsigned short height = regValue;
-            unsigned short pixels = memory[index_register + 0];
+            unsigned short height = opcode & 0x000F;
 
             general_registers[0xF] = 0;
-            //For each column in row in gfx.
-            for (int gfx_x = 0; gfx_x < 8; ++gfx_x) {
-                //Line up pixel with gfx row for bitwise and check for each bit in row
-                //If this is true then pixel will be cleared so set register F.
-                unsigned short pixel = pixels >> gfx_x;
-                //if (gfx[gfx_x + x] & pixel != 0) {
-                //    general_registers[0xF] = 1;
-                //}
+            //for each row of gfx
+            for (int gfx_y = y; gfx_y < y + height; gfx_y++) {
+                boost::dynamic_bitset<> pixels(memory[index_register + 0]);
+                boost::dynamic_bitset<> &gfx_row = gfx[gfx_y];
 
-                //Do the xor
-                //gfx[gfx_x + x] ^= pixel;
+                for (int gfx_x = x; gfx_x < x + 8; gfx_x++) {
 
+                    if ((gfx_row[gfx_x] & pixels[gfx_x]) != 0) {
+
+                        //TODO this isn't a valid check, it doe snot check that gfx_row pixel's being flipped from 1 to 0.
+
+                         char rowPixel = gfx_row[gfx_x] ^ pixels[gfx_x];
+
+                        //If this is true some pixels will be flipped for 1 to 0 so
+                        //Collision detection register should fire.
+                        if (rowPixel == 1) {
+                            general_registers[0xF] = 1;
+                        }
+                        gfx_row[gfx_x] = rowPixel;
+
+                    }
+
+
+
+
+
+
+
+                }
+
+
+               // gfx_row ^= pixels;
             }
+            drawFlag = true;
+            program_counter += 2;
         }
             break;
         case 0x0000:
@@ -185,7 +208,7 @@ void Chip8::emulateCycle() {
                 //Dealing with 0x00E0.
                 //0x00E0 clears screen
                 for (int i = 0; i < GFX_HEIGHT; ++i) {
-                    //gfx[i].reset();
+                    gfx[i].reset();
                 }
                 program_counter += 2;
             }

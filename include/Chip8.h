@@ -7,6 +7,7 @@ static const int GFX_HEIGHT = 32;
 static const int GFX_SIZE = GFX_WIDTH * GFX_HEIGHT;
 
 #include <string>
+#include <vector>
 #include <boost/dynamic_bitset.hpp>
 
 class Chip8 {
@@ -16,7 +17,6 @@ public:
   void emulateCycle();
   void setKeys();
   bool getDrawFlag();
-  int DoSomething(std::string);
   
 //TODO consider making private.
 public:
@@ -28,7 +28,7 @@ public:
   unsigned short program_counter;
 
   //TODO http://stackoverflow.com/questions/12133950/creating-vector-of-boost-dynamic-bitset-in-c
-  boost::dynamic_bitset<> gfx[GFX_HEIGHT];
+  std::vector<boost::dynamic_bitset<>> gfx;
   unsigned char delay_timer;
   unsigned char sound_timer;
 
@@ -36,6 +36,7 @@ public:
   unsigned short stack_pointer;
 
   unsigned char key[16];
+  bool drawFlag;
 
 
   void minus(int LHRegIndex, int RHRegIndex, int ResultRegIndex);
